@@ -3,6 +3,7 @@ export interface Product {
     images: string[]
     subcategory: Subcategory[]
     ratingsQuantity: number
+    priceAfterDiscount?: number
     _id: string
     title: string
     slug: string
