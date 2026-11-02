@@ -7,6 +7,7 @@ import { deleteCartItemAction } from '@/CartAction/removeCartItem'
 import { updateCartCountAction } from '@/CartAction/updateCartCount'
 import { Cart, CartProduct } from '@/types/cart.t'
 import React, { createContext, useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
 
 
 interface CartContextType {
@@ -126,9 +127,14 @@ const CartContextProvider = ({ children }: { children: React.ReactNode }) => {
         setTotalCartItem(0)
     }
 
+    // home page is public now => get the cart only when the user is logged in
+    const { status } = useSession()
+
     useEffect(function () {
-        getUserCart()
-    }, [])
+        if (status === "authenticated") {
+            getUserCart()
+        }
+    }, [status])
 
 
 

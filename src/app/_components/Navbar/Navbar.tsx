@@ -1,5 +1,6 @@
 "use client"
-import React, { useContext } from 'react'
+import React, { useContext, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import logo from "@/assets/freshcart-logo.svg"
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -13,6 +14,15 @@ const Navbar = () => {
     const { status } = useSession()
 
     const { totalCartItem } = useContext(cartContext)
+
+    const router = useRouter()
+
+    const keyword = useRef<HTMLInputElement>(null)
+
+    function search(e: React.FormEvent) {
+        e.preventDefault()
+        router.push(`/products?keyword=${keyword.current?.value || ""}`)
+    }
 
     return (
         <header className="bg-white sticky top-0 z-50 shadow-sm">
@@ -49,14 +59,17 @@ const Navbar = () => {
                             </Link>
                         </div>
 
-                        <div className='hidden lg:flex flex-1 max-w-md items-center border border-slate-200 rounded-full ps-5 pe-1 py-1'>
-                            <input type="text" placeholder='Search for products, brands and more...' className='flex-1 outline-none text-sm bg-transparent' />
-                            <span className='bg-green-600 text-white rounded-full size-9 flex items-center justify-center'><FaSearch /></span>
-                        </div>
+                        <form onSubmit={search} className='hidden lg:flex flex-1 max-w-md items-center border border-slate-200 rounded-full ps-5 pe-1 py-1'>
+                            <input ref={keyword} type="text" placeholder='Search for products, brands and more...' className='flex-1 outline-none text-sm bg-transparent' />
+                            <button type='submit' aria-label='Search' className='bg-green-600 text-white rounded-full size-9 flex items-center justify-center cursor-pointer'><FaSearch /></button>
+                        </form>
 
                         <ul className='flex flex-wrap gap-6 items-center text-slate-700 font-medium'>
                             <li>
-                                <Link href="/" className='hover:text-green-600'>Products</Link>
+                                <Link href="/" className='hover:text-green-600'>Home</Link>
+                            </li>
+                            <li>
+                                <Link href="/products" className='hover:text-green-600'>Shop</Link>
                             </li>
                             <li>
                                 <Link href="/brands" className='hover:text-green-600'>Brands </Link>
@@ -95,6 +108,11 @@ const Navbar = () => {
                             </li>
 
                             {status === "authenticated" && <>
+                                <li>
+                                    <Link href="/profile" aria-label="Profile" className='block text-slate-600 hover:text-green-600'>
+                                        <FaRegUser className='text-xl' />
+                                    </Link>
+                                </li>
                                 <li>
                                     <Button className='rounded-full px-5 h-10' onClick={() => signOut({
                                         callbackUrl: "/login"
