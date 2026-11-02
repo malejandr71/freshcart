@@ -54,7 +54,7 @@ const Navbar = () => {
                             <span className='bg-green-600 text-white rounded-full size-9 flex items-center justify-center'><FaSearch /></span>
                         </div>
 
-                        {status === "authenticated" && <ul className='flex flex-wrap gap-6 items-center text-slate-700 font-medium'>
+                        <ul className='flex flex-wrap gap-6 items-center text-slate-700 font-medium'>
                             <li>
                                 <Link href="/" className='hover:text-green-600'>Products</Link>
                             </li>
@@ -66,10 +66,10 @@ const Navbar = () => {
                                 <Link href="/categories" className='hover:text-green-600'>Categories</Link>
                             </li>
 
-                            <li>
+                            {status === "authenticated" && <li>
                                 <Link href="/allorders" className='hover:text-green-600'>allorders</Link>
-                            </li>
-                        </ul>}
+                            </li>}
+                        </ul>
 
                         {status === "loading" && <h1 className='text-slate-500'>Loading ......</h1>}
 
@@ -82,16 +82,19 @@ const Navbar = () => {
                                 <span className='text-xs leading-4 text-slate-500'>Support<br /><b className='text-slate-800 text-sm'>24/7 Help</b></span>
                             </li>
 
+                            <li>
+                                <Link href="/wishlist" aria-label="Wishlist" className='block text-slate-600 hover:text-red-500'>
+                                    <FaRegHeart className='text-xl' />
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/cart" aria-label="Cart" className='relative block text-slate-600 hover:text-green-600'>
+                                    <FaShoppingCart className='text-2xl' />
+                                    {status === "authenticated" && <span className='absolute -top-2 -end-3 bg-green-600 text-white rounded-full size-5 flex items-center justify-center text-xs'>{totalCartItem}</span>}
+                                </Link>
+                            </li>
+
                             {status === "authenticated" && <>
-                                <li>
-                                    <FaRegHeart className='text-xl text-slate-600' />
-                                </li>
-                                <li>
-                                    <Link href="/cart" className='relative block text-slate-600 hover:text-green-600'>
-                                        <FaShoppingCart className='text-2xl' />
-                                        <span className='absolute -top-2 -end-3 bg-green-600 text-white rounded-full size-5 flex items-center justify-center text-xs'>{totalCartItem}</span>
-                                    </Link>
-                                </li>
                                 <li>
                                     <Button className='rounded-full px-5 h-10' onClick={() => signOut({
                                         callbackUrl: "/login"

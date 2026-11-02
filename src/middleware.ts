@@ -12,7 +12,9 @@ export async function middleware(request: NextRequest) {
 
     const authPage = ["/login", "/register"]
 
-    const routes = ["/", "/productDetails", "/cart", "/categories", "/brands", "/payment", "/allorders"]
+    // Home, productDetails, brands, categories => public (no login needed)
+    // login is required only for cart, wishlist and buying (payment / orders)
+    const routes = ["/cart", "/wishlist", "/payment", "/allorders"]
 
 
 
@@ -28,5 +30,5 @@ export async function middleware(request: NextRequest) {
 }
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: ["/", "/productDetails/:path*", "/cart", "/categories", "/brands", "/payment", "/allorders", "/login", "/register"],
+    matcher: ["/cart", "/wishlist", "/payment", "/allorders", "/login", "/register"],
 }

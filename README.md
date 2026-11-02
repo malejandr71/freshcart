@@ -16,3 +16,6 @@ Home (slider, categories slider, products) · Product details · Register · Log
 ## UI Design
 The UI is styled after the FreshCart **Figma** design (top bar, navbar with search, hero slider, features strip, Shop By Category, Featured Products cards, footer, two-column login/register, cart summary, payment card, orders list).
 The logic, file names and function names follow Eng. Huda Khaled's lessons (e.g. `CartId`, `isLoading`, `afterPayment()`, `CahPaymentAction`, `onlinePaymentAction`, `deleteCartItemAction`, `clearCartItemAction`).
+
+## Auth rules
+Home, Product Details, Brands and Categories are public. Login is required only for Cart, Wishlist and buying (Payment / All Orders) — handled in `src/middleware.ts` and in `CartBtn` / `WishlistBtn`.
