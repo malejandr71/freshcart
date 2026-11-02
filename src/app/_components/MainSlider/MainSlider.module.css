@@ -3,3 +3,37 @@
     background-size: cover;
     background-position: center;
 }
+
+/* Figma: white round arrows + white pagination dots */
+.slider :global(.swiper-button-next),
+.slider :global(.swiper-button-prev) {
+    background: white;
+    color: #16a34a;
+    width: 48px;
+    height: 48px;
+    border-radius: 9999px;
+    box-shadow: 0 4px 12px rgb(0 0 0 / 0.15);
+}
+
+.slider :global(.swiper-button-next svg),
+.slider :global(.swiper-button-prev svg) {
+    width: 14px;
+    height: 14px;
+}
+
+.slider :global(.swiper-button-next::after),
+.slider :global(.swiper-button-prev::after) {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.slider :global(.swiper-pagination-bullet) {
+    background: white;
+    opacity: .6;
+}
+
+.slider :global(.swiper-pagination-bullet-active) {
+    opacity: 1;
+    width: 32px;
+    border-radius: 9999px;
+}

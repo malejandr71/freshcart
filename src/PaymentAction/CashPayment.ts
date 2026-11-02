@@ -12,7 +12,7 @@ export async function CahPaymentAction(cartId: string, value: object) {
     }
 
 
-    const { data } = await axios.post(`https://ecommerce.routemisr.com/api/v2/orders/${cartId}`, value, {
+    const { data } = await axios.post(`https://ecommerce.routemisr.com/api/v1/orders/${cartId}`, value, {
         headers: {
             token: token as string
         }

@@ -3,7 +3,7 @@
 import { getMyToken } from "@/utilities/token";
 import axios from "axios";
 
-export async function OnlinePaymentAction(cartId: string, value: object) {
+export async function onlinePaymentAction(cartId: string, value: object) {
 
     const token = await getMyToken()
 

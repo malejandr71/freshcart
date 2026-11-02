@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button'
 import { cartContext } from '@/Context/CartContext'
 import React, { useContext } from 'react'
 import { toast } from 'sonner'
+import { FaPlus, FaShoppingCart } from 'react-icons/fa'
 
-const CartBtn = ({ id }: { id: string }) => {
+const CartBtn = ({ id, full = false }: { id: string, full?: boolean }) => {
 
     const { addProductCart } = useContext(cartContext)
 
@@ -34,7 +35,9 @@ const CartBtn = ({ id }: { id: string }) => {
 
     return (
         <>
-            <Button onClick={addProductToCart} className="w-full">Add to Cart</Button>
+            {full
+                ? <Button onClick={addProductToCart} className="w-full h-12 rounded-lg text-base"><FaShoppingCart /> Add to Cart</Button>
+                : <Button onClick={addProductToCart} size="icon" aria-label="Add to Cart" className="rounded-full size-10 shrink-0"><FaPlus /></Button>}
         </>
     )
 }

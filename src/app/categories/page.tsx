@@ -11,7 +11,7 @@ const Categories = async () => {
     return (
         <>
             <div className='bg-gradient-to-r from-green-600 to-green-400 text-white py-12'>
-                <div className='w-full md:w-[80%] mx-auto px-5'>
+                <div className='w-full md:w-[90%] mx-auto px-5'>
                     <p className='text-sm mb-4 text-white/80'>
                         <Link href="/">Home</Link> / <span className='text-white'>Categories</span>
                     </p>
@@ -21,7 +21,7 @@ const Categories = async () => {
             </div>
 
             <div className='my-10'>
-                <div className='p-5 w-full md:w-[80%] mx-auto'>
+                <div className='p-5 w-full md:w-[90%] mx-auto'>
                     <div className='grid grid-cols-10 gap-4'>
                         {data.map(function (category: Category, idx: number) {
                             return <div key={idx} className='col-span-10 sm:col-span-5 md:col-span-2'>

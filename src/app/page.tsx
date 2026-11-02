@@ -4,6 +4,7 @@ import { Product } from '@/types/product.t'
 import HomeCard from './_components/HomeCard/HomeCard'
 import MainSlider from './_components/MainSlider/MainSlider'
 import Categories from './_components/Categories/Categories'
+import Features from './_components/Features/Features'
 
 const Products = async () => {
 
@@ -15,15 +16,17 @@ const Products = async () => {
         <>
             <MainSlider />
 
+            <Features />
+
             <Categories />
 
             <div className='my-10'>
 
-                <div className='p-5 w-full md:w-[80%] mx-auto'>
+                <div className='p-5 w-full md:w-[90%] mx-auto'>
 
-                    <h1 className='text-3xl text-green-700 mb-5 text-center'>Products</h1>
+                    <h1 className='text-3xl font-bold mb-8 border-s-4 border-green-600 ps-3'>Featured <span className='text-green-600'>Products</span></h1>
 
-                    <div className='grid grid-cols-12 gap-3'>
+                    <div className='grid grid-cols-12 xl:grid-cols-5 gap-5'>
 
                         {data.map(function (product: Product, idx: number) {
                             return <HomeCard product={product} key={idx} />

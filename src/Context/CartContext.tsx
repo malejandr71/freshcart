@@ -1,20 +1,19 @@
 "use client"
 
 import { addProductToCartAction } from '@/CartAction/addProdutCart'
-import { clearCartAction } from '@/CartAction/clearCart'
+import { clearCartItemAction } from '@/CartAction/clearCart'
 import { getUserCartAction } from '@/CartAction/getUserCart'
-import { removeCartItemAction } from '@/CartAction/removeCartItem'
+import { deleteCartItemAction } from '@/CartAction/removeCartItem'
 import { updateCartCountAction } from '@/CartAction/updateCartCount'
 import { Cart, CartProduct } from '@/types/cart.t'
 import React, { createContext, useEffect, useState } from 'react'
-import { toast } from 'sonner'
 
 
 interface CartContextType {
     products: CartProduct[]
     totalCartPrice: number
     totalCartItem: number
-    cartId: string
+    CartId: string
     isLoading: boolean
     getUserCart: () => Promise<void>
     addProductCart: (id: string) => Promise<Cart | undefined>
@@ -32,12 +31,13 @@ const CartContextProvider = ({ children }: { children: React.ReactNode }) => {
     const [products, setProducts] = useState<CartProduct[]>([])
     const [totalCartPrice, setTotalCartPrice] = useState(0)
     const [totalCartItem, setTotalCartItem] = useState(0)
-    const [cartId, setCartId] = useState("")
-    const [isLoading, setIsLoading] = useState(true)
+    const [CartId, setCartId] = useState("")
+    const [isLoading, setIsLoading] = useState(false)
 
 
 
     async function getUserCart() {
+        setIsLoading(true)
         try {
 
             const data: Cart = await getUserCartAction()
@@ -49,9 +49,11 @@ const CartContextProvider = ({ children }: { children: React.ReactNode }) => {
             setTotalCartItem(data.numOfCartItems)
             setCartId(data.cartId)
 
+            setIsLoading(false)
+
         } catch (error) {
             console.log(error);
-        } finally {
+
             setIsLoading(false)
         }
     }
@@ -78,13 +80,11 @@ const CartContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function deleteCartItem(id: string) {
         try {
-            const data: Cart = await removeCartItemAction(id)
+            const data: Cart = await deleteCartItemAction(id)
 
             setProducts(data.data.products)
             setTotalCartPrice(data.data.totalCartPrice)
             setTotalCartItem(data.numOfCartItems)
-
-            toast.success("Product removed successfully", { position: "top-center" })
 
         } catch (error) {
             console.log(error);
@@ -93,7 +93,7 @@ const CartContextProvider = ({ children }: { children: React.ReactNode }) => {
 
     async function clearCart() {
         try {
-            const data = await clearCartAction()
+            const data = await clearCartItemAction()
 
             console.log(data);
 
@@ -124,7 +124,6 @@ const CartContextProvider = ({ children }: { children: React.ReactNode }) => {
         setProducts([])
         setTotalCartPrice(0)
         setTotalCartItem(0)
-        setCartId("")
     }
 
     useEffect(function () {
@@ -139,7 +138,7 @@ const CartContextProvider = ({ children }: { children: React.ReactNode }) => {
                 totalCartItem,
                 totalCartPrice,
                 products,
-                cartId,
+                CartId,
                 isLoading,
                 getUserCart,
                 addProductCart,

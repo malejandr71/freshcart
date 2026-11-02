@@ -4,7 +4,7 @@ import { getMyToken } from "@/utilities/token";
 import axios from "axios";
 
 
-export async function clearCartAction() {
+export async function clearCartItemAction() {
 
 
     const token = await getMyToken()

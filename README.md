@@ -12,3 +12,7 @@ npm run dev
 
 ## Features
 Home (slider, categories slider, products) · Product details · Register · Login (next-auth) · Protected routes (middleware) · Cart (add / update / remove / clear) · Payment (cash + online Stripe checkout) · All orders · Brands · Categories
+
+## UI Design
+The UI is styled after the FreshCart **Figma** design (top bar, navbar with search, hero slider, features strip, Shop By Category, Featured Products cards, footer, two-column login/register, cart summary, payment card, orders list).
+The logic, file names and function names follow Eng. Huda Khaled's lessons (e.g. `CartId`, `isLoading`, `afterPayment()`, `CahPaymentAction`, `onlinePaymentAction`, `deleteCartItemAction`, `clearCartItemAction`).

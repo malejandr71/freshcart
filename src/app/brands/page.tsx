@@ -11,7 +11,7 @@ const Brands = async () => {
     return (
         <>
             <div className='bg-gradient-to-r from-violet-600 to-purple-400 text-white py-12'>
-                <div className='w-full md:w-[80%] mx-auto px-5'>
+                <div className='w-full md:w-[90%] mx-auto px-5'>
                     <p className='text-sm mb-4 text-white/80'>
                         <Link href="/">Home</Link> / <span className='text-white'>Brands</span>
                     </p>
@@ -21,7 +21,7 @@ const Brands = async () => {
             </div>
 
             <div className='my-10'>
-                <div className='p-5 w-full md:w-[80%] mx-auto'>
+                <div className='p-5 w-full md:w-[90%] mx-auto'>
                     <div className='grid grid-cols-12 gap-4'>
                         {data.map(function (brand: Brand, idx: number) {
                             return <div key={idx} className='col-span-6 sm:col-span-4 md:col-span-3 lg:col-span-2'>
