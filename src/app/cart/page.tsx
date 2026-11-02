@@ -1,6 +1,8 @@
 "use client"
 import { cartContext } from '@/Context/CartContext'
-import React, { useContext } from 'react'
+import React, { useContext, useRef, useState } from 'react'
+import { applyCouponAction } from '@/CartAction/applyCoupon'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { CartProduct } from '@/types/cart.t'
 import Image from 'next/image'
@@ -12,6 +14,21 @@ const Cart = () => {
   const { totalCartPrice, products, isLoading, deleteCartItem, updateCartCount, clearCart } = useContext(cartContext)
 
 
+
+  // Apply Coupon To Cart (v2)
+  const coupon = useRef<HTMLInputElement>(null)
+  const [totalAfterDiscount, setTotalAfterDiscount] = useState(0)
+
+  async function applyCoupon() {
+    const data = await applyCouponAction(coupon.current?.value || "")
+    console.log(data);
+    if (data?.status === "success") {
+      toast.success("Coupon applied", { position: "top-center" })
+      setTotalAfterDiscount(data.data.totalAfterDiscount)
+    } else {
+      toast.error(data?.message, { position: "top-center" })
+    }
+  }
 
   if (isLoading) {
     return <Loading />
@@ -76,6 +93,13 @@ const Cart = () => {
               <p className='flex justify-between mb-3 text-slate-600'><span>Items</span><span>{products.length}</span></p>
               <p className='flex justify-between mb-3 text-slate-600'><span>Shipping</span><span className='text-green-600'>Free</span></p>
               <p className='font-mono my-3 text-green-700 flex justify-between border-t pt-3 text-lg'><span>Total Cart Price :</span><span className='font-bold'>{totalCartPrice} EGP</span></p>
+              {totalAfterDiscount > 0 && <p className='flex justify-between mb-3 text-green-700 font-bold'><span>After Discount</span><span>{totalAfterDiscount} EGP</span></p>}
+
+              <div className='flex gap-2 my-4'>
+                <input ref={coupon} placeholder='Coupon code' className='flex-1 border border-slate-200 rounded-lg px-3 outline-none focus:border-green-600' />
+                <Button onClick={applyCoupon} variant="outline" className='h-10 border-green-600 text-green-600'>Apply</Button>
+              </div>
+
               <Link href="/payment"><Button className='w-full h-12 rounded-lg text-base mt-2'>Proceed to Checkout</Button></Link>
             </div>
           </div>

@@ -8,7 +8,10 @@ import { cartContext } from '@/Context/CartContext'
 import { CahPaymentAction } from '@/PaymentAction/CashPayment'
 import { onlinePaymentAction } from '@/PaymentAction/OnlinePayment'
 import { useRouter } from 'next/navigation'
-import React, { useContext, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { getAddressesAction } from '@/AddressAction/getAddresses'
+import { getSpecificAddressAction } from '@/AddressAction/getSpecificAddress'
+import { Address } from '@/types/address.t'
 
 
 const Payment = () => {
@@ -20,6 +23,34 @@ const Payment = () => {
     const details = useRef<HTMLInputElement>(null)
     const phone = useRef<HTMLInputElement>(null)
     const city = useRef<HTMLInputElement>(null)
+
+
+    // saved addresses (User Addresses API)
+    const [addresses, setAddresses] = useState<Address[]>([])
+
+    async function getAddresses() {
+        try {
+            const data = await getAddressesAction()
+            setAddresses(data.data)
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    async function chooseAddress(id: string) {
+        try {
+            const data = await getSpecificAddressAction(id)
+            if (details.current) details.current.value = data.data.details
+            if (phone.current) phone.current.value = data.data.phone
+            if (city.current) city.current.value = data.data.city
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(function () {
+        getAddresses()
+    }, [])
 
 
     async function cashPayment() {
@@ -84,6 +115,15 @@ const Payment = () => {
 
                 <h1 className='text-3xl font-bold text-center mb-2'>Payment </h1>
                 <p className='text-center text-slate-500 mb-8'>Complete your order by adding the shipping address</p>
+
+                {addresses?.length > 0 && <div className='mb-6'>
+                    <p className='text-sm font-medium mb-2'>Saved Addresses</p>
+                    <div className='flex flex-wrap gap-2'>
+                        {addresses.map(function (address: Address, idx: number) {
+                            return <button key={idx} onClick={() => chooseAddress(address._id)} className='px-4 py-2 rounded-full border border-slate-200 hover:border-green-600 hover:text-green-600 text-sm cursor-pointer'>{address.name} - {address.city}</button>
+                        })}
+                    </div>
+                </div>}
 
                 <Label htmlFor='details' className='mb-2'>Details</Label>
 

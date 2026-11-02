@@ -6,6 +6,10 @@ import React from 'react'
 import { RxStarFilled } from 'react-icons/rx'
 import { FaTruck, FaUndoAlt, FaShieldAlt } from 'react-icons/fa'
 import CartBtn from '@/app/_components/CartBtn/CartBtn'
+import WishlistBtn from '@/app/_components/WishlistBtn/WishlistBtn'
+import Reviews from '@/app/_components/Reviews/Reviews'
+import HomeCard from '@/app/_components/HomeCard/HomeCard'
+import { getProductsByFilter } from '@/apis/products'
 
 const ProductData = async ({ params }: { params: Promise<{ id: string }> }) => {
 
@@ -14,6 +18,10 @@ const ProductData = async ({ params }: { params: Promise<{ id: string }> }) => {
     const data: Product = await getSingleProducts(id)
 
     console.log(data);
+
+    // related products => same category
+    const related = await getProductsByFilter(`category[in]=${data?.category?._id}&limit=6`)
+    const relatedProducts: Product[] = related?.data?.filter((p: Product) => p.id !== data?.id).slice(0, 5) ?? []
 
     return (
         <div className='my-12 w-full md:w-[90%] mx-auto px-5'>
@@ -28,6 +36,13 @@ const ProductData = async ({ params }: { params: Promise<{ id: string }> }) => {
                     <div className='bg-white border border-slate-200 rounded-2xl p-5'>
                         <Image src={data?.imageCover} alt={data?.title} width={500} height={500} className='w-full max-h-[500px] object-contain' />
                     </div>
+                    <div className='grid grid-cols-4 gap-3 mt-3'>
+                        {data?.images?.slice(0, 4).map(function (img: string, idx: number) {
+                            return <div key={idx} className='bg-white border border-slate-200 rounded-xl p-2'>
+                                <Image src={img} alt={data?.title} width={150} height={150} className='w-full h-20 object-contain' />
+                            </div>
+                        })}
+                    </div>
                 </div>
 
                 <div className="col-span-12 md:col-span-7">
@@ -41,7 +56,10 @@ const ProductData = async ({ params }: { params: Promise<{ id: string }> }) => {
                         <p className='my-2 text-green-600 text-3xl font-bold mb-5'>{data?.price} EGP</p>
                         <p className='text-slate-600 leading-7 mb-6'>{data?.description}</p>
 
-                        <CartBtn id={data?.id} full />
+                        <div className='flex gap-3 items-center'>
+                            <div className='flex-1'><CartBtn id={data?.id} full /></div>
+                            <WishlistBtn id={data?.id} />
+                        </div>
 
                         <div className='grid grid-cols-3 gap-3 mt-8 text-sm'>
                             <div className='bg-slate-50 rounded-xl p-3 flex items-center gap-2'><FaTruck className='text-green-600' /> Free Delivery</div>
@@ -51,6 +69,17 @@ const ProductData = async ({ params }: { params: Promise<{ id: string }> }) => {
                     </div>
                 </div>
             </div>
+
+            <Reviews id={data?.id} />
+
+            {relatedProducts.length > 0 && <div className='mt-14'>
+                <h2 className='text-2xl font-bold mb-6 border-s-4 border-green-600 ps-3'>Related <span className='text-green-600'>Products</span></h2>
+                <div className='grid grid-cols-12 xl:grid-cols-5 gap-5'>
+                    {relatedProducts.map(function (product: Product, idx: number) {
+                        return <HomeCard product={product} key={idx} />
+                    })}
+                </div>
+            </div>}
         </div>
     )
 }
