@@ -25,7 +25,6 @@ const Payment = () => {
     const city = useRef<HTMLInputElement>(null)
 
 
-    // saved addresses (User Addresses API)
     const [addresses, setAddresses] = useState<Address[]>([])
 
     async function getAddresses() {

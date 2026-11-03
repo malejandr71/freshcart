@@ -15,18 +15,20 @@ const Cart = () => {
 
 
 
-  // Apply Coupon To Cart (v2)
   const coupon = useRef<HTMLInputElement>(null)
   const [totalAfterDiscount, setTotalAfterDiscount] = useState(0)
 
   async function applyCoupon() {
-    const data = await applyCouponAction(coupon.current?.value || "")
-    console.log(data);
-    if (data?.status === "success") {
-      toast.success("Coupon applied", { position: "top-center" })
-      setTotalAfterDiscount(data.data.totalAfterDiscount)
-    } else {
-      toast.error(data?.message, { position: "top-center" })
+    try {
+      const data = await applyCouponAction(coupon.current?.value || "")
+      console.log(data);
+      if (data.status === "success") {
+        toast.success("Coupon applied", { position: "top-center" })
+        setTotalAfterDiscount(data.data.totalAfterDiscount)
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Coupon is invalid or has expired", { position: "top-center" })
     }
   }
 

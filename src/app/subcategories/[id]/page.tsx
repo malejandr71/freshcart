@@ -1,10 +1,9 @@
 import { getSpecificSubCategory } from '@/apis/subcategories'
-import { getProductsByFilter } from '@/apis/products'
+import { getProductsBySubCategory } from '@/apis/products'
 import { Product } from '@/types/product.t'
 import { SubCategory } from '@/types/subcategory.t'
 import Link from 'next/link'
 import React from 'react'
-import PageHeader from '../../_components/PageHeader/PageHeader'
 import HomeCard from '../../_components/HomeCard/HomeCard'
 
 const SubCategoryDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
@@ -13,11 +12,19 @@ const SubCategoryDetails = async ({ params }: { params: Promise<{ id: string }> 
 
     const subCategory: SubCategory = await getSpecificSubCategory(id)
 
-    const { data }: { data: Product[] } = await getProductsByFilter(`subcategory=${id}`)
+    const data: Product[] = await getProductsBySubCategory(id)
 
     return (
         <>
-            <PageHeader title={subCategory?.name} desc={`${data?.length ?? 0} products`} crumb={`SubCategories / ${subCategory?.name}`} />
+            <div className='bg-gradient-to-r from-green-600 to-green-400 text-white py-12'>
+                <div className='w-full md:w-[90%] mx-auto px-5'>
+                    <p className='text-sm mb-4 text-white/80'>
+                        <Link href="/">Home</Link> / <span className='text-white'>SubCategories / {subCategory?.name}</span>
+                    </p>
+                    <h1 className='text-4xl font-bold mb-2'>{subCategory?.name}</h1>
+                    <p className='text-white/80'>{data?.length} products</p>
+                </div>
+            </div>
 
             <div className='p-5 my-8 w-full md:w-[90%] mx-auto'>
 

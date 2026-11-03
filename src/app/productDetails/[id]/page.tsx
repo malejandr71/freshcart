@@ -9,7 +9,7 @@ import CartBtn from '@/app/_components/CartBtn/CartBtn'
 import WishlistBtn from '@/app/_components/WishlistBtn/WishlistBtn'
 import Reviews from '@/app/_components/Reviews/Reviews'
 import HomeCard from '@/app/_components/HomeCard/HomeCard'
-import { getProductsByFilter } from '@/apis/products'
+import { getProductsByCategory } from '@/apis/products'
 
 const ProductData = async ({ params }: { params: Promise<{ id: string }> }) => {
 
@@ -19,9 +19,10 @@ const ProductData = async ({ params }: { params: Promise<{ id: string }> }) => {
 
     console.log(data);
 
-    // related products => same category
-    const related = await getProductsByFilter(`category[in]=${data?.category?._id}&limit=6`)
-    const relatedProducts: Product[] = related?.data?.filter((p: Product) => p.id !== data?.id).slice(0, 5) ?? []
+    const related: Product[] = await getProductsByCategory(data?.category?._id)
+    const relatedProducts = related.filter(function (product: Product) {
+        return product.id !== data?.id
+    }).slice(0, 5)
 
     return (
         <div className='my-12 w-full md:w-[90%] mx-auto px-5'>

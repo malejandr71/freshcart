@@ -1,69 +1,94 @@
 "use client"
 import { Button } from '@/components/ui/button'
+import {
+    Field,
+    FieldError,
+    FieldLabel,
+} from "@/components/ui/field"
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { zodResolver } from '@hookform/resolvers/zod'
 import axios from 'axios'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import React, { useRef, useState } from 'react'
+import React, { useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { forgotPasswordSchema, forgotPasswordSchemaType, resetCodeSchema, resetCodeSchemaType, resetPasswordSchema, resetPasswordSchemaType } from '@/schema/forgotPasswordSchema'
 
-// Forgot Password => Verify Reset Code => Reset Password
 const ForgotPassword = () => {
 
     const router = useRouter()
 
     const [step, setStep] = useState(1)
-    const [isLoading, setIsLoading] = useState(false)
-
-    const email = useRef<HTMLInputElement>(null)
-    const resetCode = useRef<HTMLInputElement>(null)
-    const newPassword = useRef<HTMLInputElement>(null)
-
     const [userEmail, setUserEmail] = useState("")
 
 
-    async function forgotPassword() {
-        setIsLoading(true)
+    const emailForm = useForm<forgotPasswordSchemaType>({
+        defaultValues: {
+            email: ""
+        },
+        resolver: zodResolver(forgotPasswordSchema)
+    })
+
+    const codeForm = useForm<resetCodeSchemaType>({
+        defaultValues: {
+            resetCode: ""
+        },
+        resolver: zodResolver(resetCodeSchema)
+    })
+
+    const passwordForm = useForm<resetPasswordSchemaType>({
+        defaultValues: {
+            newPassword: ""
+        },
+        resolver: zodResolver(resetPasswordSchema)
+    })
+
+
+    async function forgotPassword(values: forgotPasswordSchemaType) {
+
         try {
-            const { data } = await axios.post("https://ecommerce.routemisr.com/api/v1/auth/forgotPasswords", { email: email.current?.value })
-            console.log(data);
+
+            const { data } = await axios.post("https://ecommerce.routemisr.com/api/v1/auth/forgotPasswords", values)
+
+            console.log(data)
             toast.success(data.message, { position: "top-center" })
-            setUserEmail(email.current?.value || "")
+            setUserEmail(values.email)
             setStep(2)
+
         } catch (e) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            toast.error((e as any)?.response?.data?.message, { position: "top-center" })
+            toast.error(axios.isAxiosError(e) ? e.response?.data?.message : "something went wrong", { position: "top-center" })
         }
-        setIsLoading(false)
     }
 
-    async function verifyResetCode() {
-        setIsLoading(true)
+    async function verifyResetCode(values: resetCodeSchemaType) {
+
         try {
-            const { data } = await axios.post("https://ecommerce.routemisr.com/api/v1/auth/verifyResetCode", { resetCode: resetCode.current?.value })
-            console.log(data);
+
+            const { data } = await axios.post("https://ecommerce.routemisr.com/api/v1/auth/verifyResetCode", values)
+
+            console.log(data)
             toast.success("Code verified", { position: "top-center" })
             setStep(3)
+
         } catch (e) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            toast.error((e as any)?.response?.data?.message, { position: "top-center" })
+            toast.error(axios.isAxiosError(e) ? e.response?.data?.message : "something went wrong", { position: "top-center" })
         }
-        setIsLoading(false)
     }
 
-    async function resetPassword() {
-        setIsLoading(true)
+    async function resetPassword(values: resetPasswordSchemaType) {
+
         try {
-            const { data } = await axios.put("https://ecommerce.routemisr.com/api/v1/auth/resetPassword", { email: userEmail, newPassword: newPassword.current?.value })
-            console.log(data);
+
+            const { data } = await axios.put("https://ecommerce.routemisr.com/api/v1/auth/resetPassword", { email: userEmail, newPassword: values.newPassword })
+
+            console.log(data)
             toast.success("Password changed, login with the new password", { position: "top-center" })
             router.push("/login")
+
         } catch (e) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            toast.error((e as any)?.response?.data?.message, { position: "top-center" })
+            toast.error(axios.isAxiosError(e) ? e.response?.data?.message : "something went wrong", { position: "top-center" })
         }
-        setIsLoading(false)
     }
 
     return (
@@ -82,23 +107,50 @@ const ForgotPassword = () => {
                     })}
                 </div>
 
-                {step === 1 && <>
-                    <Label htmlFor='email' className='mb-2'>Email Address</Label>
-                    <Input ref={email} type="email" id='email' className='mb-5 h-11 rounded-lg' />
-                    <Button disabled={isLoading} onClick={forgotPassword} className='w-full h-12 rounded-lg text-base'>Send Reset Code</Button>
-                </>}
+                {step === 1 && <form onSubmit={emailForm.handleSubmit(forgotPassword)}>
+                    <Controller
+                        name="email"
+                        control={emailForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>Email Address</FieldLabel>
+                                <Input className="mb-5 h-11 rounded-lg" {...field} type='email' id={field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Button disabled={emailForm.formState.isSubmitting} type='submit' className='w-full h-12 rounded-lg text-base'>Send Reset Code</Button>
+                </form>}
 
-                {step === 2 && <>
-                    <Label htmlFor='resetCode' className='mb-2'>Reset Code</Label>
-                    <Input ref={resetCode} type="text" id='resetCode' className='mb-5 h-11 rounded-lg tracking-widest' />
-                    <Button disabled={isLoading} onClick={verifyResetCode} className='w-full h-12 rounded-lg text-base'>Verify Code</Button>
-                </>}
+                {step === 2 && <form onSubmit={codeForm.handleSubmit(verifyResetCode)}>
+                    <Controller
+                        name="resetCode"
+                        control={codeForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>Reset Code</FieldLabel>
+                                <Input className="mb-5 h-11 rounded-lg tracking-widest" {...field} type='text' id={field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Button disabled={codeForm.formState.isSubmitting} type='submit' className='w-full h-12 rounded-lg text-base'>Verify Code</Button>
+                </form>}
 
-                {step === 3 && <>
-                    <Label htmlFor='newPassword' className='mb-2'>New Password</Label>
-                    <Input ref={newPassword} type="password" id='newPassword' className='mb-5 h-11 rounded-lg' />
-                    <Button disabled={isLoading} onClick={resetPassword} className='w-full h-12 rounded-lg text-base'>Reset Password</Button>
-                </>}
+                {step === 3 && <form onSubmit={passwordForm.handleSubmit(resetPassword)}>
+                    <Controller
+                        name="newPassword"
+                        control={passwordForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
+                                <Input className="mb-5 h-11 rounded-lg" {...field} type='password' id={field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Button disabled={passwordForm.formState.isSubmitting} type='submit' className='w-full h-12 rounded-lg text-base'>Reset Password</Button>
+                </form>}
 
                 <p className='text-center text-slate-500 mt-6'>Remember your password? <Link href="/login" className='text-green-600 font-semibold'>Sign In</Link></p>
             </div>

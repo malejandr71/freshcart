@@ -15,12 +15,6 @@ import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { registerSchema, registerSchemaType } from '@/schema/registerSchema'
 
-/*
-  form => shad cn ui
-  RHF =>  react hook form
-  zod => validation
-*/
-
 const Register = () => {
 
   const route = useRouter()
@@ -48,8 +42,7 @@ const Register = () => {
       route.push("/login")
 
     } catch (e) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      toast.error((e as any)?.response?.data?.message, { position: "top-center" })
+      toast.error(axios.isAxiosError(e) ? e.response?.data?.message : "something went wrong", { position: "top-center" })
     }
 
   }

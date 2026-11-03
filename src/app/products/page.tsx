@@ -1,11 +1,9 @@
-import { getProductsByFilter } from '@/apis/products'
+import { getProductsPage, searchProducts } from '@/apis/products'
 import { Product } from '@/types/product.t'
 import Link from 'next/link'
 import React from 'react'
-import PageHeader from '../_components/PageHeader/PageHeader'
 import HomeCard from '../_components/HomeCard/HomeCard'
 
-// Shop page => all products with pagination (page) + search by title (keyword)
 const Shop = async ({ searchParams }: { searchParams: Promise<{ page?: string, keyword?: string }> }) => {
 
     const { page = "1", keyword = "" } = await searchParams
@@ -14,20 +12,24 @@ const Shop = async ({ searchParams }: { searchParams: Promise<{ page?: string, k
     let numberOfPages = 1
 
     if (keyword) {
-        // the API has no search endpoint => get all products then filter by title
-        const { data }: { data: Product[] } = await getProductsByFilter("limit=1000")
-        products = data.filter(function (product: Product) {
-            return product.title.toLowerCase().includes(keyword.toLowerCase())
-        })
+        products = await searchProducts(keyword)
     } else {
-        const data = await getProductsByFilter(`limit=20&page=${page}`)
-        products = data.data
-        numberOfPages = data.metadata.numberOfPages
+        const { data, metadata } = await getProductsPage(page)
+        products = data
+        numberOfPages = metadata.numberOfPages
     }
 
     return (
         <>
-            <PageHeader title={keyword ? `Search: ${keyword}` : 'All Products'} desc={`${products.length} products`} crumb='Shop' />
+            <div className='bg-gradient-to-r from-green-600 to-green-400 text-white py-12'>
+                <div className='w-full md:w-[90%] mx-auto px-5'>
+                    <p className='text-sm mb-4 text-white/80'>
+                        <Link href="/">Home</Link> / <span className='text-white'>Shop</span>
+                    </p>
+                    <h1 className='text-4xl font-bold mb-2'>{keyword ? `Search: ${keyword}` : 'All Products'}</h1>
+                    <p className='text-white/80'>{products.length} products</p>
+                </div>
+            </div>
 
             <div className='p-5 my-8 w-full md:w-[90%] mx-auto'>
 

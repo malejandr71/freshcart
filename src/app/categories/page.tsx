@@ -5,7 +5,6 @@ import { SubCategory } from '@/types/subcategory.t'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import PageHeader from '../_components/PageHeader/PageHeader'
 
 const Categories = async () => {
 
@@ -15,7 +14,15 @@ const Categories = async () => {
 
     return (
         <>
-            <PageHeader title='All Categories' desc='Browse our wide range of product categories' crumb='Categories' />
+            <div className='bg-gradient-to-r from-green-600 to-green-400 text-white py-12'>
+                <div className='w-full md:w-[90%] mx-auto px-5'>
+                    <p className='text-sm mb-4 text-white/80'>
+                        <Link href="/">Home</Link> / <span className='text-white'>Categories</span>
+                    </p>
+                    <h1 className='text-4xl font-bold mb-2'>All Categories</h1>
+                    <p className='text-white/80'>Browse our wide range of product categories</p>
+                </div>
+            </div>
 
             <div className='my-10'>
                 <div className='p-5 w-full md:w-[90%] mx-auto'>
