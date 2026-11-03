@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
-// This function can be marked `async` if using `await` inside
+
 export async function middleware(request: NextRequest) {
 
     const token = await getToken({ req: request })
@@ -12,8 +12,6 @@ export async function middleware(request: NextRequest) {
 
     const authPage = ["/login", "/register", "/forgotpassword"]
 
-    // Home, productDetails, brands, categories => public (no login needed)
-    // login is required only for cart, wishlist and buying (payment / orders)
     const routes = ["/cart", "/wishlist", "/payment", "/allorders", "/profile"]
 
 
@@ -28,7 +26,6 @@ export async function middleware(request: NextRequest) {
 
     return NextResponse.next()
 }
-// See "Matching Paths" below to learn more
 export const config = {
     matcher: ["/cart", "/wishlist", "/payment", "/allorders", "/profile", "/login", "/register", "/forgotpassword"],
 }

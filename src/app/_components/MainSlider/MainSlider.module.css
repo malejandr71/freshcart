@@ -4,7 +4,6 @@
     background-position: center;
 }
 
-/* Figma: white round arrows + white pagination dots */
 .slider :global(.swiper-button-next),
 .slider :global(.swiper-button-prev) {
     background: white;

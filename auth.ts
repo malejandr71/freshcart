@@ -28,7 +28,6 @@ export const authOptions: AuthOptions = {
                 const payload = await response.json()
 
                 console.log(payload);
-                //   user: { name: 'Huda Khaled', email: 'huda.route@gmail.com', role: 'user' }
 
                 if (payload.message === 'success') {
 

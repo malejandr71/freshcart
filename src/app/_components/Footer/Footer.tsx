@@ -4,7 +4,6 @@ import Link from 'next/link'
 import logo from "@/assets/freshcart-logo.svg"
 import { FaTruck, FaUndoAlt, FaShieldAlt, FaHeadset, FaPhoneAlt, FaRegEnvelope, FaMapMarkerAlt, FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from 'react-icons/fa'
 
-// Footer design taken from the FreshCart Figma file
 const Footer = () => {
 
     const features = [

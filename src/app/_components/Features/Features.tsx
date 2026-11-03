@@ -1,7 +1,6 @@
 import React from 'react'
 import { FaTruck, FaShieldAlt, FaUndoAlt, FaHeadset } from 'react-icons/fa'
 
-// Features strip under the slider (Figma home design)
 const Features = () => {
 
     const features = [

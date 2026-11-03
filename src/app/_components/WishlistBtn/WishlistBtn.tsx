@@ -15,7 +15,6 @@ const WishlistBtn = ({ id }: { id: string }) => {
 
     async function addProductToWishlist() {
 
-        // login is required only here (wishlist)
         if (status !== "authenticated") {
             toast.error("Login First", { position: "top-center" })
             router.push("/login")

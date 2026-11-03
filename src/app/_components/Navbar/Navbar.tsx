@@ -27,7 +27,6 @@ const Navbar = () => {
     return (
         <header className="bg-white sticky top-0 z-50 shadow-sm">
 
-            {/* top bar (Figma) */}
             <div className='hidden md:block border-b border-slate-100 text-sm text-slate-600'>
                 <div className='w-full md:w-[90%] px-5 mx-auto flex justify-between items-center py-2'>
                     <div className='flex gap-6'>

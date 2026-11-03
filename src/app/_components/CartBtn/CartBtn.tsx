@@ -21,7 +21,6 @@ const CartBtn = ({ id, full = false }: { id: string, full?: boolean }) => {
 
     async function addProductToCart() {
 
-        // login is required only when adding to cart / buying
         if (status !== "authenticated") {
             toast.error("Login First", { position: "top-center" })
             router.push("/login")
