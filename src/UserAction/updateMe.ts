@@ -12,18 +12,11 @@ export async function updateMeAction(values: { name: string, email: string, phon
     }
 
 
-    try {
-        const { data } = await axios.put(`https://ecommerce.routemisr.com/api/v1/users/updateMe/`, values, {
-            headers: {
-                token: token as string
-            }
-        })
+    const { data } = await axios.put(`https://ecommerce.routemisr.com/api/v1/users/updateMe/`, values, {
+        headers: {
+            token: token as string
+        }
+    })
 
-        return data
-
-    } catch (error) {
-        // return the API message (ex: "You already reviewed this product")
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (error as any)?.response?.data
-    }
+    return data
 }

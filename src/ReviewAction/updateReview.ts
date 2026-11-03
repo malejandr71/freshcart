@@ -12,18 +12,11 @@ export async function updateReviewAction(id: string, values: { review: string, r
     }
 
 
-    try {
-        const { data } = await axios.put(`https://ecommerce.routemisr.com/api/v1/reviews/${id}`, values, {
-            headers: {
-                token: token as string
-            }
-        })
+    const { data } = await axios.put(`https://ecommerce.routemisr.com/api/v1/reviews/${id}`, values, {
+        headers: {
+            token: token as string
+        }
+    })
 
-        return data
-
-    } catch (error) {
-        // return the API message (ex: "You already reviewed this product")
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return (error as any)?.response?.data
-    }
+    return data
 }

@@ -1,7 +1,12 @@
 "use client"
 import { Button } from '@/components/ui/button'
+import {
+    Field,
+    FieldError,
+    FieldLabel,
+} from "@/components/ui/field"
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { verifyTokenAction } from '@/UserAction/verifyToken'
 import { updateMeAction } from '@/UserAction/updateMe'
 import { changePasswordAction } from '@/UserAction/changePassword'
@@ -9,9 +14,13 @@ import { addAddressAction } from '@/AddressAction/addAddress'
 import { getAddressesAction } from '@/AddressAction/getAddresses'
 import { removeAddressAction } from '@/AddressAction/removeAddress'
 import { getSpecificAddressAction } from '@/AddressAction/getSpecificAddress'
+import { updateMeSchema, updateMeSchemaType } from '@/schema/updateMeSchema'
+import { changePasswordSchema, changePasswordSchemaType } from '@/schema/changePasswordSchema'
+import { addressSchema, addressSchemaType } from '@/schema/addressSchema'
 import { Address } from '@/types/address.t'
 import { signOut } from 'next-auth/react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { FaMapMarkerAlt, FaTrash, FaRegUser } from 'react-icons/fa'
 import Loading from '../loading'
@@ -23,21 +32,34 @@ const Profile = () => {
     const [selected, setSelected] = useState<Address | null>(null)
     const [isLoading, setIsLoading] = useState(false)
 
-    // update data
-    const name = useRef<HTMLInputElement>(null)
-    const email = useRef<HTMLInputElement>(null)
-    const phone = useRef<HTMLInputElement>(null)
 
-    // change password
-    const currentPassword = useRef<HTMLInputElement>(null)
-    const password = useRef<HTMLInputElement>(null)
-    const rePassword = useRef<HTMLInputElement>(null)
+    const updateMeForm = useForm<updateMeSchemaType>({
+        defaultValues: {
+            name: "",
+            email: "",
+            phone: ""
+        },
+        resolver: zodResolver(updateMeSchema)
+    })
 
-    // address
-    const addressName = useRef<HTMLInputElement>(null)
-    const details = useRef<HTMLInputElement>(null)
-    const addressPhone = useRef<HTMLInputElement>(null)
-    const city = useRef<HTMLInputElement>(null)
+    const changePasswordForm = useForm<changePasswordSchemaType>({
+        defaultValues: {
+            currentPassword: "",
+            password: "",
+            rePassword: ""
+        },
+        resolver: zodResolver(changePasswordSchema)
+    })
+
+    const addressForm = useForm<addressSchemaType>({
+        defaultValues: {
+            name: "",
+            details: "",
+            phone: "",
+            city: ""
+        },
+        resolver: zodResolver(addressSchema)
+    })
 
 
     async function getProfile() {
@@ -45,6 +67,7 @@ const Profile = () => {
         try {
             const data = await verifyTokenAction()
             setUser(data.decoded)
+            updateMeForm.setValue("name", data.decoded.name)
 
             const addressesData = await getAddressesAction()
             setAddresses(addressesData.data)
@@ -56,55 +79,46 @@ const Profile = () => {
         }
     }
 
-    async function updateMe() {
-        const values = {
-            name: name.current?.value || "",
-            email: email.current?.value || "",
-            phone: phone.current?.value || ""
-        }
-        const data = await updateMeAction(values)
-        console.log(data);
-        if (data?.message === "success") {
-            toast.success("Data updated, login again", { position: "top-center" })
-            signOut({ callbackUrl: "/login" })
-        } else {
-            toast.error(data?.errors?.msg || data?.message, { position: "top-center" })
-        }
-    }
-
-    async function changePassword() {
-        const values = {
-            currentPassword: currentPassword.current?.value || "",
-            password: password.current?.value || "",
-            rePassword: rePassword.current?.value || ""
-        }
-        const data = await changePasswordAction(values)
-        console.log(data);
-        if (data?.message === "success") {
-            toast.success("Password changed, login again", { position: "top-center" })
-            signOut({ callbackUrl: "/login" })
-        } else {
-            toast.error(data?.errors?.msg || data?.message, { position: "top-center" })
-        }
-    }
-
-    async function addAddress() {
-        const values = {
-            name: addressName.current?.value || "",
-            details: details.current?.value || "",
-            phone: addressPhone.current?.value || "",
-            city: city.current?.value || ""
-        }
-        const data = await addAddressAction(values)
-        console.log(data);
-        if (data?.status === "success") {
-            toast.success(data.message, { position: "top-center" })
-            setAddresses(data.data)
-            for (const input of [addressName, details, addressPhone, city]) {
-                if (input.current) input.current.value = ""
+    async function updateMe(values: updateMeSchemaType) {
+        try {
+            const data = await updateMeAction(values)
+            console.log(data);
+            if (data.message === "success") {
+                toast.success("Data updated, login again", { position: "top-center" })
+                signOut({ callbackUrl: "/login" })
             }
-        } else {
-            toast.error(data?.errors?.msg || data?.message, { position: "top-center" })
+        } catch (error) {
+            console.log(error);
+            toast.error("E-mail already in use or invalid data", { position: "top-center" })
+        }
+    }
+
+    async function changePassword(values: changePasswordSchemaType) {
+        try {
+            const data = await changePasswordAction(values)
+            console.log(data);
+            if (data.message === "success") {
+                toast.success("Password changed, login again", { position: "top-center" })
+                signOut({ callbackUrl: "/login" })
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Current password is incorrect", { position: "top-center" })
+        }
+    }
+
+    async function addAddress(values: addressSchemaType) {
+        try {
+            const data = await addAddressAction(values)
+            console.log(data);
+            if (data.status === "success") {
+                toast.success(data.message, { position: "top-center" })
+                setAddresses(data.data)
+                addressForm.reset()
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("can't add this address", { position: "top-center" })
         }
     }
 
@@ -151,24 +165,82 @@ const Profile = () => {
 
                 <div className='col-span-12 lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6'>
                     <h2 className='text-xl font-bold mb-5'>Update Your Data</h2>
-                    <Label htmlFor='name' className='mb-2'>Name</Label>
-                    <Input ref={name} id='name' defaultValue={user?.name} className='mb-4 h-11 rounded-lg' />
-                    <Label htmlFor='email' className='mb-2'>Email</Label>
-                    <Input ref={email} id='email' type='email' className='mb-4 h-11 rounded-lg' />
-                    <Label htmlFor='phone' className='mb-2'>Phone</Label>
-                    <Input ref={phone} id='phone' type='tel' className='mb-5 h-11 rounded-lg' />
-                    <Button onClick={updateMe} className='w-full h-11 rounded-lg'>Update Data</Button>
+<form onSubmit={updateMeForm.handleSubmit(updateMe)}>
+                    <Controller
+                        name="name"
+                        control={updateMeForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"updateMeForm-" + field.name}>Name</FieldLabel>
+                                <Input className="mb-4 h-11 rounded-lg" {...field} type='text' id={"updateMeForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="email"
+                        control={updateMeForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"updateMeForm-" + field.name}>Email</FieldLabel>
+                                <Input className="mb-4 h-11 rounded-lg" {...field} type='email' id={"updateMeForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="phone"
+                        control={updateMeForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"updateMeForm-" + field.name}>Phone</FieldLabel>
+                                <Input className="mb-5 h-11 rounded-lg" {...field} type='tel' id={"updateMeForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Button type='submit' className='w-full h-11 rounded-lg'>Update Data</Button>
+                    </form>
                 </div>
 
                 <div className='col-span-12 lg:col-span-6 bg-white border border-slate-200 rounded-2xl p-6'>
                     <h2 className='text-xl font-bold mb-5'>Change Password</h2>
-                    <Label htmlFor='currentPassword' className='mb-2'>Current Password</Label>
-                    <Input ref={currentPassword} id='currentPassword' type='password' className='mb-4 h-11 rounded-lg' />
-                    <Label htmlFor='password' className='mb-2'>New Password</Label>
-                    <Input ref={password} id='password' type='password' className='mb-4 h-11 rounded-lg' />
-                    <Label htmlFor='rePassword' className='mb-2'>Confirm New Password</Label>
-                    <Input ref={rePassword} id='rePassword' type='password' className='mb-5 h-11 rounded-lg' />
-                    <Button onClick={changePassword} className='w-full h-11 rounded-lg'>Change Password</Button>
+<form onSubmit={changePasswordForm.handleSubmit(changePassword)}>
+                    <Controller
+                        name="currentPassword"
+                        control={changePasswordForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"changePasswordForm-" + field.name}>Current Password</FieldLabel>
+                                <Input className="mb-4 h-11 rounded-lg" {...field} type='password' id={"changePasswordForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="password"
+                        control={changePasswordForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"changePasswordForm-" + field.name}>New Password</FieldLabel>
+                                <Input className="mb-4 h-11 rounded-lg" {...field} type='password' id={"changePasswordForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="rePassword"
+                        control={changePasswordForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"changePasswordForm-" + field.name}>Confirm New Password</FieldLabel>
+                                <Input className="mb-5 h-11 rounded-lg" {...field} type='password' id={"changePasswordForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Button type='submit' className='w-full h-11 rounded-lg'>Change Password</Button>
+                    </form>
                 </div>
 
                 <div className='col-span-12 bg-white border border-slate-200 rounded-2xl p-6'>
@@ -176,15 +248,53 @@ const Profile = () => {
 
                     <div className='grid grid-cols-12 gap-6'>
                         <div className='col-span-12 lg:col-span-5'>
-                            <Label htmlFor='addressName' className='mb-2'>Address Name</Label>
-                            <Input ref={addressName} id='addressName' placeholder='Home' className='mb-4 h-11 rounded-lg' />
-                            <Label htmlFor='details' className='mb-2'>Details</Label>
-                            <Input ref={details} id='details' className='mb-4 h-11 rounded-lg' />
-                            <Label htmlFor='addressPhone' className='mb-2'>Phone</Label>
-                            <Input ref={addressPhone} id='addressPhone' type='tel' className='mb-4 h-11 rounded-lg' />
-                            <Label htmlFor='city' className='mb-2'>City</Label>
-                            <Input ref={city} id='city' className='mb-5 h-11 rounded-lg' />
-                            <Button onClick={addAddress} className='w-full h-11 rounded-lg'>Add Address</Button>
+<form onSubmit={addressForm.handleSubmit(addAddress)}>
+                    <Controller
+                        name="name"
+                        control={addressForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"addressForm-" + field.name}>Address Name</FieldLabel>
+                                <Input className="mb-4 h-11 rounded-lg" {...field} type='text' id={"addressForm-" + field.name} placeholder='Home' aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="details"
+                        control={addressForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"addressForm-" + field.name}>Details</FieldLabel>
+                                <Input className="mb-4 h-11 rounded-lg" {...field} type='text' id={"addressForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="phone"
+                        control={addressForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"addressForm-" + field.name}>Phone</FieldLabel>
+                                <Input className="mb-4 h-11 rounded-lg" {...field} type='tel' id={"addressForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="city"
+                        control={addressForm.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor={"addressForm-" + field.name}>City</FieldLabel>
+                                <Input className="mb-5 h-11 rounded-lg" {...field} type='text' id={"addressForm-" + field.name} aria-invalid={fieldState.invalid} />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Button type='submit' className='w-full h-11 rounded-lg'>Add Address</Button>
+                    </form>
                         </div>
 
                         <div className='col-span-12 lg:col-span-7 space-y-3'>

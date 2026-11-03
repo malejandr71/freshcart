@@ -127,7 +127,6 @@ const CartContextProvider = ({ children }: { children: React.ReactNode }) => {
         setTotalCartItem(0)
     }
 
-    // home page is public now => get the cart only when the user is logged in
     const { status } = useSession()
 
     useEffect(function () {

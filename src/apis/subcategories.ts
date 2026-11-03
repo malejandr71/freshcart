@@ -1,6 +1,5 @@
 export async function getAllSubCategories() {
 
-    // the API returns max 50 per page => get all pages
     const response = await fetch("https://ecommerce.routemisr.com/api/v1/subcategories?limit=50")
 
     const { data, metadata } = await response.json()
